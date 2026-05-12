@@ -1,41 +1,659 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-	<title>Temperature & Humidity</title>
-	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-	<meta property="og:image" content="http://s14.postimg.org/i9kww70bl/Screenshot_1_Custom.png"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #080b10;
+      --surface: #0e1420;
+      --border: #1e2d45;
+      --accent: #00d4ff;
+      --accent2: #7b4fff;
+      --text: #c8d8f0;
+      --muted: #4a6080;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Grid Background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Glow Orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: .18;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 500px; height: 500px; background: var(--accent2); top: -150px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 400px; height: 400px; background: var(--accent); bottom: -100px; right: -80px; animation-delay: -6s; }
+    @keyframes drift { from { transform: translate(0,0); } to { transform: translate(40px, 30px); } }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 40px;
+      background: rgba(8,11,16,.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+      letter-spacing: -.02em;
+    }
+    .logo span { color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    nav a:hover { color: var(--accent); }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 40px 80px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 4px;
+      padding: 6px 14px;
+      font-size: .72rem;
+      color: var(--accent);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp .6s .2s forwards;
+    }
+    .tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: blink 1.4s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    h1 {
+      font-family: var(--sans);
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+      color: #fff;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp .7s .35s forwards;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sub {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 520px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp .7s .5s forwards;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .7s .65s forwards;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .25s;
+      letter-spacing: .04em;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border: 1px solid var(--accent);
+    }
+    .btn-primary:hover { background: #fff; border-color: #fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,212,255,.3); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(24px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* ── Terminal Block ── */
+    .terminal {
+      position: absolute;
+      right: -40px; bottom: 100px;
+      width: 360px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeUp .8s .8s forwards;
+      display: none;
+    }
+    @media (min-width: 900px) { .terminal { display: block; } }
+    .term-bar {
+      background: #13192a;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .d1{background:#ff5f57;} .d2{background:#febc2e;} .d3{background:#28c840;}
+    .term-title { font-size: .7rem; color: var(--muted); margin-left: 8px; }
+    .term-body { padding: 20px; font-size: .75rem; line-height: 2; }
+    .term-line { display: block; }
+    .prompt { color: var(--accent2); }
+    .cmd { color: #fff; }
+    .out { color: var(--muted); }
+    .ok { color: #28c840; }
+    .cursor {
+      display: inline-block;
+      width: 8px; height: 14px;
+      background: var(--accent);
+      vertical-align: text-bottom;
+      animation: blink 1s infinite;
+    }
+
+    /* ── Sections ── */
+    section {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+    .section-label {
+      font-size: .7rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-family: var(--sans);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 48px;
+      letter-spacing: -.02em;
+    }
+
+    /* ── Cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+      transition: all .3s;
+      cursor: default;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,212,255,.08);
+    }
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+    }
+    .card h3 {
+      font-family: var(--sans);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .card p { font-size: .78rem; color: var(--muted); line-height: 1.8; }
+
+    /* ── Skills Pills ── */
+    .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: .75rem;
+      color: var(--text);
+      transition: all .2s;
+    }
+    .pill:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Contact ── */
+    .contact-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 4px;
+      padding: 14px 22px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: .8rem;
+      transition: all .25s;
+    }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .72rem;
+      color: var(--muted);
+    }
+
+    /* ── Gallery ── */
+    .gallery-grid {
+      columns: 3 200px;
+      gap: 14px;
+    }
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--surface);
+    }
+    .gallery-item img {
+      width: 100%;
+      display: block;
+      transition: transform .4s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.05); }
+    .gallery-item .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+    }
+    .gallery-item:hover .overlay { opacity: 1; }
+    .gallery-item .overlay span {
+      font-size: .72rem;
+      color: #fff;
+      letter-spacing: .06em;
+    }
+    /* placeholder card when no image */
+    .gallery-placeholder {
+      break-inside: avoid;
+      margin-bottom: 14px;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .75rem;
+      text-align: center;
+      padding: 20px;
+    }
+    .gallery-placeholder .ph-icon { font-size: 1.8rem; opacity: .4; }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(0,0,0,.92);
+      backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      cursor: zoom-out;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 8px;
+      box-shadow: 0 40px 100px rgba(0,0,0,.8);
+      animation: lbIn .25s ease;
+    }
+    @keyframes lbIn { from{transform:scale(.9);opacity:0} to{transform:scale(1);opacity:1} }
+    #lightbox .lb-caption { color: var(--muted); font-size: .75rem; letter-spacing: .08em; }
+    #lb-close {
+      position: fixed;
+      top: 20px; right: 28px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.8rem;
+      cursor: pointer;
+      opacity: .6;
+      transition: opacity .2s;
+    }
+    #lb-close:hover { opacity: 1; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 640px) {
+      nav { padding: 16px 20px; }
+      nav ul { gap: 16px; }
+      .hero { padding: 100px 20px 60px; }
+      section { padding: 60px 20px; }
+      footer { padding: 24px 20px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<div class="page-header">
-				  <h1>Temperature & Humidity <small>Tracking at comsci 18-501</small></h1>
-				</div>
-			</div>
-			
-		</div>
-		<div class="row">
-			<div class="col-md-6" align="center">
-				<iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/100863/charts/1?bgcolor=%23ffffff&color=%232ecc71&dynamic=true&results=60&type=line&xaxis=Time&yaxis=Temperature+"></iframe>
 
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
 
+  <!-- Nav -->
+  <nav>
+    <div class="logo">dev<span>.</span>me</div>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-			</div>
-			<div class="col-md-6" align="center">
-				
-				<iframe width="450" height="260" style="border: 1px solid #cccccc;" src="https://thingspeak.com/channels/100863/charts/2?bgcolor=%23ffffff&color=%23f1c40f&dynamic=true&results=60&type=line&xaxis=Time"></iframe>
+  <!-- Hero -->
+  <div style="position:relative; z-index:1;">
+    <div class="hero" style="position:relative;">
+      <div class="tag">✦ Available for work</div>
+      <h1>Hello,<br/>I'm <em>Your Name</em></h1>
+      <p class="sub">
+        Backend Developer &amp; DevOps Engineer ที่หลงใหลใน clean architecture,
+        Kubernetes, และการ migrate legacy systems ให้ทำงานได้อย่างมั่นคง
+      </p>
+      <div class="cta-row">
+        <a href="#projects" class="btn btn-primary">▶ ดูผลงาน</a>
+        <a href="#contact" class="btn btn-ghost">✉ ติดต่อ</a>
+      </div>
 
+      <!-- Terminal -->
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="dot d1"></div>
+          <div class="dot d2"></div>
+          <div class="dot d3"></div>
+          <span class="term-title">bash ~ </span>
+        </div>
+        <div class="term-body">
+          <span class="term-line"><span class="prompt">$ </span><span class="cmd">whoami</span></span>
+          <span class="term-line"><span class="out">→ Backend Developer</span></span>
+          <span class="term-line">&nbsp;</span>
+          <span class="term-line"><span class="prompt">$ </span><span class="cmd">kubectl get pods</span></span>
+          <span class="term-line"><span class="ok">✔ hpws-pod &nbsp;&nbsp; Running</span></span>
+          <span class="term-line"><span class="ok">✔ api-pod &nbsp;&nbsp;&nbsp; Running</span></span>
+          <span class="term-line">&nbsp;</span>
+          <span class="term-line"><span class="prompt">$ </span><span class="cmd">git push origin main</span></span>
+          <span class="term-line"><span class="ok">✔ Deployed to GitHub Pages</span></span>
+          <span class="term-line"><span class="prompt">$ </span><span class="cursor"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- About -->
+  <section id="about">
+    <div class="section-label">// 01 About</div>
+    <h2>ทำไมต้องเลือกผม</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">⚙️</div>
+        <h3>Backend Engineering</h3>
+        <p>เชี่ยวชาญ Java, Spring Boot, Open Liberty SOAP services และ legacy system migration</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">☸️</div>
+        <h3>DevOps & Kubernetes</h3>
+        <p>ออกแบบ CI/CD pipeline ด้วย Jenkins, deploy บน Kubernetes พร้อม Ingress routing</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🗄️</div>
+        <h3>Database</h3>
+        <p>Oracle 10g → 19c migration, SQL Server, และ optimization สำหรับ enterprise banking</p>
+      </div>
+    </div>
+  </section>
 
+  <!-- Projects -->
+  <section id="projects">
+    <div class="section-label">// 02 Projects</div>
+    <h2>ผลงานที่ผ่านมา</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🏦</div>
+        <h3>Banking Legacy Migration</h3>
+        <p>Migrate WebSphere → Open Liberty on Kubernetes พร้อม zero-downtime deployment strategy</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>Report Modernization</h3>
+        <p>Upgrade SAP BusinessObjects Enterprise XI → 2025 ครอบคลุม Crystal Reports หลายร้อยรายงาน</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔄</div>
+        <h3>CI/CD Pipeline</h3>
+        <p>ออกแบบ Jenkins Groovy pipeline ครบ DEV/SIT/PRD สำหรับ multi-service Java application</p>
+      </div>
+    </div>
+  </section>
 
-			</div>
-		</div>
-	</div>
+  <!-- Gallery -->
+  <section id="gallery">
+    <div class="section-label">// 03 Gallery</div>
+    <h2>รูปภาพ</h2>
+
+    <div class="gallery-grid">
+
+      <!-- ✏️ วางรูปได้เลย: แก้ src="images/photo1.jpg" และ data-caption="คำบรรยาย" -->
+      <div class="gallery-item" onclick="openLb(this)">
+        <img src="images/photo1.jpg" alt="Photo 1" data-caption="Photo 1" loading="lazy" />
+        <div class="overlay"><span>Photo 1</span></div>
+      </div>
+
+      <div class="gallery-item" onclick="openLb(this)">
+        <img src="images/photo2.jpg" alt="Photo 2" data-caption="Photo 2" loading="lazy" />
+        <div class="overlay"><span>Photo 2</span></div>
+      </div>
+
+      <div class="gallery-item" onclick="openLb(this)">
+        <img src="images/photo3.jpg" alt="Photo 3" data-caption="Photo 3" loading="lazy" />
+        <div class="overlay"><span>Photo 3</span></div>
+      </div>
+
+      <div class="gallery-item" onclick="openLb(this)">
+        <img src="images/photo4.jpg" alt="Photo 4" data-caption="Photo 4" loading="lazy" />
+        <div class="overlay"><span>Photo 4</span></div>
+      </div>
+
+      <div class="gallery-item" onclick="openLb(this)">
+        <img src="images/photo5.jpg" alt="Photo 5" data-caption="Photo 5" loading="lazy" />
+        <div class="overlay"><span>Photo 5</span></div>
+      </div>
+
+      <div class="gallery-item" onclick="openLb(this)">
+        <img src="images/photo6.jpg" alt="Photo 6" data-caption="Photo 6" loading="lazy" />
+        <div class="overlay"><span>Photo 6</span></div>
+      </div>
+
+      <!-- เพิ่ม .gallery-item ได้เรื่อยๆ -->
+
+    </div>
+
+    <p style="color:var(--muted);font-size:.72rem;margin-top:24px;line-height:1.8;">
+      📁 วางรูปไว้ใน folder <code style="color:var(--accent);">images/</code> แล้วแก้ชื่อไฟล์ใน src="" ได้เลย
+    </p>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lightbox" onclick="closeLb()">
+    <button id="lb-close" onclick="closeLb()">✕</button>
+    <img id="lb-img" src="" alt="" />
+    <div class="lb-caption" id="lb-caption"></div>
+  </div>
+
+  <!-- Skills -->
+  <section id="skills">
+    <div class="section-label">// 04 Skills</div>
+    <h2>เทคโนโลยีที่ใช้</h2>
+    <div class="pills">
+      <div class="pill">Java</div>
+      <div class="pill">Spring Boot</div>
+      <div class="pill">Open Liberty</div>
+      <div class="pill">Kubernetes</div>
+      <div class="pill">Jenkins</div>
+      <div class="pill">Docker</div>
+      <div class="pill">Oracle DB</div>
+      <div class="pill">Git</div>
+      <div class="pill">Linux</div>
+      <div class="pill">SOAP / REST</div>
+      <div class="pill">Maven</div>
+      <div class="pill">SQL Server</div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="section-label">// 05 Contact</div>
+    <h2>ติดต่อได้เลย</h2>
+    <p style="color:var(--muted); font-size:.85rem; line-height:1.8;">
+      พร้อมรับโปรเจกต์ใหม่ หรือแลกเปลี่ยนความรู้ด้านเทคนิค — ทักมาได้เลยครับ
+    </p>
+    <div class="contact-row">
+      <a href="mailto:your@email.com" class="contact-link">✉ your@email.com</a>
+      <a href="https://github.com/yourusername" target="_blank" class="contact-link">⌥ GitHub</a>
+      <a href="https://linkedin.com/in/yourusername" target="_blank" class="contact-link">◈ LinkedIn</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Your Name — Hosted free on GitHub Pages</span>
+    <span style="color:var(--accent);">built with ❤ &amp; git push</span>
+  </footer>
+  <script>
+    function openLb(item) {
+      const img = item.querySelector('img');
+      document.getElementById('lb-img').src = img.src;
+      document.getElementById('lb-caption').textContent = img.dataset.caption || '';
+      document.getElementById('lightbox').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLb() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLb(); });
+  </script>
 </body>
 </html>
-
-
-
